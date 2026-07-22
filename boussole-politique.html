@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Boussole — Testez votre positionnement politique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=IBM+Plex+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --stone:#e7e3d8;
+    --stone-dark:#dcd7c8;
+    --ink:#1f2321;
+    --ink-soft:#4a4d47;
+    --gold:#b8923f;
+    --gauche:#a13d3d;
+    --gauche-x:#7a1f1f;
+    --droite:#31577a;
+    --droite-x:#1b3650;
+    --centre:#6b5b7e;
+    --paper:#f3f1e8;
+    --line: rgba(31,35,33,0.14);
+    --shadow: 0 20px 50px -20px rgba(20,20,15,0.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1200px 600px at 15% -10%, rgba(184,146,63,0.10), transparent 60%),
+      radial-gradient(1000px 700px at 110% 10%, rgba(49,87,122,0.08), transparent 55%),
+      var(--stone);
+    color:var(--ink);
+    font-family:'Source Sans 3', sans-serif;
+    min-height:100vh;
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+    padding:48px 20px 80px;
+  }
+  .frame{
+    width:100%;
+    max-width:760px;
+  }
+  .masthead{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:10px;
+    margin-bottom:36px;
+  }
+  .masthead .mark{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .masthead .brand{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:20px;
+    letter-spacing:0.01em;
+  }
+  .card{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:4px;
+    box-shadow:var(--shadow);
+    padding:56px 52px;
+    position:relative;
+    overflow:hidden;
+  }
+  .card::before{
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:5px;
+    background:linear-gradient(90deg, var(--gauche-x) 0%, var(--gauche) 25%, var(--centre) 50%, var(--droite) 75%, var(--droite-x) 100%);
+  }
+
+  /* ---------- INTRO ---------- */
+  .view{display:none;}
+  .view.active{display:block; animation:fade .5s ease both;}
+  @keyframes fade{from{opacity:0; transform:translateY(6px);} to{opacity:1; transform:translateY(0);}}
+
+  #intro .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.16em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:18px;
+  }
+  #intro h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:42px;
+    line-height:1.08;
+    margin:0 0 20px;
+    letter-spacing:-0.01em;
+  }
+  #intro p{
+    font-size:16.5px;
+    line-height:1.65;
+    color:var(--ink-soft);
+    max-width:56ch;
+    margin:0 0 14px;
+  }
+  .theme-list{
+    display:flex; flex-wrap:wrap; gap:8px;
+    margin:28px 0 34px;
+  }
+  .theme-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:0.03em;
+    border:1px solid var(--line);
+    padding:6px 12px;
+    border-radius:100px;
+    color:var(--ink-soft);
+  }
+  .start-btn{
+    font-family:'Source Sans 3', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:15px 30px;
+    border-radius:3px;
+    cursor:pointer;
+    letter-spacing:0.01em;
+    transition:transform .15s ease, background .15s ease;
+  }
+  .start-btn:hover{ background:#000; transform:translateY(-1px); }
+  .start-btn:focus-visible{ outline:2px solid var(--gold); outline-offset:3px; }
+  .fine{
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    opacity:0.85;
+  }
+
+  /* ---------- QUIZ ---------- */
+  .quiz-top{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:8px;
+  }
+  .qcount{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--ink-soft); letter-spacing:0.05em;
+  }
+  .qcat{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--gold);
+  }
+  .progress-track{
+    width:100%; height:4px; background:var(--stone-dark); border-radius:2px; overflow:hidden; margin-bottom:36px;
+  }
+  .progress-fill{
+    height:100%;
+    background:linear-gradient(90deg, var(--gauche) 0%, var(--centre) 50%, var(--droite) 100%);
+    width:0%;
+    transition:width .4s ease;
+  }
+  #quiz h2{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:27px;
+    line-height:1.32;
+    margin:0 0 36px;
+    letter-spacing:-0.005em;
+  }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .opt{
+    text-align:left;
+    font-family:'Source Sans 3', sans-serif;
+    font-size:15.5px;
+    font-weight:500;
+    padding:15px 18px;
+    border:1.5px solid var(--line);
+    background:transparent;
+    border-radius:3px;
+    cursor:pointer;
+    display:flex; align-items:center; gap:14px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .opt .dot{
+    width:9px; height:9px; border-radius:50%; flex:0 0 auto; background:var(--ink-soft); opacity:.35;
+  }
+  .opt:hover{ border-color:var(--ink); background:rgba(31,35,33,0.03); }
+  .opt:focus-visible{ outline:2px solid var(--gold); outline-offset:2px; }
+
+  .quiz-nav{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:34px;
+  }
+  .back-link{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px; color:var(--ink-soft); background:none; border:none; cursor:pointer;
+    letter-spacing:0.03em;
+  }
+  .back-link:disabled{ opacity:0.3; cursor:default; }
+
+  /* ---------- RESULTS ---------- */
+  #results .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.16em; text-transform:uppercase; color:var(--gold);
+    margin-bottom:14px;
+  }
+  #results h2{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:38px;
+    margin:0 0 6px;
+  }
+  #results .sub{
+    font-size:15px; color:var(--ink-soft); margin-bottom:36px; max-width:58ch; line-height:1.6;
+  }
+
+  .gauge-wrap{ margin:20px 0 46px; }
+  .gauge{
+    position:relative;
+    height:14px;
+    border-radius:8px;
+    background:linear-gradient(90deg,
+      var(--gauche-x) 0%, var(--gauche) 20%, var(--centre) 50%, var(--droite) 80%, var(--droite-x) 100%);
+  }
+  .gauge-zones{
+    display:flex; justify-content:space-between;
+    margin-top:9px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:10px; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-soft);
+  }
+  .needle{
+    position:absolute;
+    top:-9px;
+    width:3px; height:32px;
+    background:var(--ink);
+    border-radius:2px;
+    left:50%;
+    transform:translateX(-50%);
+    transition:left 1.1s cubic-bezier(.16,1,.3,1);
+  }
+  .needle::after{
+    content:'';
+    position:absolute; top:-6px; left:50%; transform:translateX(-50%);
+    width:0; height:0;
+    border-left:6px solid transparent; border-right:6px solid transparent;
+    border-bottom:7px solid var(--ink);
+  }
+
+  .verdict-box{
+    border:1.5px solid var(--ink);
+    padding:22px 24px;
+    border-radius:3px;
+    margin-bottom:40px;
+    background:rgba(255,255,255,0.35);
+  }
+  .verdict-label{
+    font-family:'Fraunces', serif;
+    font-size:24px;
+    font-weight:600;
+    margin-bottom:6px;
+  }
+  .verdict-score{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+  }
+
+  .breakdown-title{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+  .bd-row{
+    display:grid;
+    grid-template-columns:150px 1fr 46px;
+    align-items:center;
+    gap:14px;
+    margin-bottom:13px;
+  }
+  .bd-label{ font-size:13.5px; font-weight:600; }
+  .bd-track{
+    position:relative;
+    height:7px;
+    background:var(--stone-dark);
+    border-radius:4px;
+  }
+  .bd-mid{
+    position:absolute; left:50%; top:-3px; width:1px; height:13px; background:rgba(31,35,33,0.25);
+  }
+  .bd-fill{
+    position:absolute; top:0; height:100%; border-radius:4px;
+    background:var(--ink-soft);
+  }
+  .bd-val{
+    font-family:'IBM Plex Mono', monospace; font-size:11px; color:var(--ink-soft); text-align:right;
+  }
+
+  .restart-row{
+    display:flex; gap:14px; margin-top:36px; flex-wrap:wrap;
+  }
+  .ghost-btn{
+    font-family:'Source Sans 3', sans-serif;
+    font-weight:600; font-size:14.5px;
+    background:none;
+    border:1.5px solid var(--ink);
+    color:var(--ink);
+    padding:12px 22px;
+    border-radius:3px;
+    cursor:pointer;
+  }
+  .ghost-btn:hover{ background:var(--ink); color:var(--paper); }
+
+  footer{
+    text-align:center;
+    margin-top:26px;
+    font-size:12px;
+    color:var(--ink-soft);
+    opacity:0.7;
+  }
+
+  @media (max-width:600px){
+    .card{ padding:36px 24px; }
+    #intro h1{ font-size:32px; }
+    #results h2{ font-size:30px; }
+    .bd-row{ grid-template-columns:100px 1fr 40px; gap:8px; }
+  }
+
+  @media (prefers-reduced-motion:reduce){
+    .needle{ transition:none; }
+    .view.active{ animation:none; }
+  }
+</style>
+</head>
+<body>
+<div class="frame">
+
+  <div class="masthead">
+    <div class="brand">La Boussole</div>
+    <div class="mark">Test d'orientation politique</div>
+  </div>
+
+  <div class="card">
+
+    <!-- INTRO -->
+    <div id="intro" class="view active">
+      <div class="eyebrow">24 questions · 8 thèmes</div>
+      <h1>Où vous situez-vous&nbsp;sur l'échiquier politique&nbsp;?</h1>
+      <p>Répondez à 24 affirmations sur la santé, le social, l'économie, la sécurité, l'immigration, l'environnement, l'éducation et les institutions. Pour chacune, indiquez votre degré d'accord.</p>
+      <p>À la fin, vous obtiendrez une tendance indicative — de l'extrême gauche à l'extrême droite — ainsi qu'un détail par thème.</p>
+      <div class="theme-list">
+        <span class="theme-chip">Économie</span>
+        <span class="theme-chip">Social</span>
+        <span class="theme-chip">Santé</span>
+        <span class="theme-chip">Sécurité</span>
+        <span class="theme-chip">Immigration</span>
+        <span class="theme-chip">Environnement</span>
+        <span class="theme-chip">Éducation</span>
+        <span class="theme-chip">Institutions & Europe</span>
+      </div>
+      <button class="start-btn" onclick="startQuiz()">Commencer le test →</button>
+      <div class="fine">Environ 4 minutes. Aucune réponse n'est enregistrée ni transmise : tout se passe dans votre navigateur.</div>
+    </div>
+
+    <!-- QUIZ -->
+    <div id="quiz" class="view">
+      <div class="quiz-top">
+        <span class="qcount" id="qcount">Question 01 / 24</span>
+        <span class="qcat" id="qcat">Économie</span>
+      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+      <h2 id="qtext">…</h2>
+      <div class="options" id="options"></div>
+      <div class="quiz-nav">
+        <button class="back-link" id="backBtn" onclick="goBack()">← Question précédente</button>
+      </div>
+    </div>
+
+    <!-- RESULTS -->
+    <div id="results" class="view">
+      <div class="eyebrow">Résultat</div>
+      <h2 id="resultTitle">…</h2>
+      <div class="sub" id="resultSub">…</div>
+
+      <div class="gauge-wrap">
+        <div class="gauge"><div class="needle" id="needle"></div></div>
+        <div class="gauge-zones">
+          <span>Ext. gauche</span><span>Gauche</span><span>Centre</span><span>Droite</span><span>Ext. droite</span>
+        </div>
+      </div>
+
+      <div class="verdict-box">
+        <div class="verdict-label" id="verdictLabel">…</div>
+        <div class="verdict-score" id="verdictScore">Score global : …</div>
+      </div>
+
+      <div class="breakdown-title">Détail par thème</div>
+      <div id="breakdown"></div>
+
+      <div class="restart-row">
+        <button class="ghost-btn" onclick="restart()">Refaire le test</button>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>Test simplifié à visée réflexive — pas un instrument scientifique certifié. Les pondérations reflètent des positionnements conventionnels et sont discutables.</footer>
+</div>
+
+<script>
+const questions = [
+  {cat:'Économie',      text:"Les impôts sur les entreprises sont trop élevés et freinent l'emploi.", w:1.5},
+  {cat:'Social',         text:"Les aides sociales devraient être augmentées, même si cela coûte plus cher à l'État.", w:-1.5},
+  {cat:'Santé',          text:"Les hôpitaux et la sécurité sociale doivent rester entièrement publics et gratuits.", w:-1.5},
+  {cat:'Sécurité',       text:"Il faut plus de policiers dans les rues et plus de caméras de surveillance.", w:1.5},
+  {cat:'Immigration',    text:"La France accueille trop d'immigrés et doit fermer davantage ses frontières.", w:2},
+  {cat:'Environnement',  text:"Les entreprises qui polluent doivent être sanctionnées plus sévèrement, même si cela leur coûte cher.", w:-1.5},
+  {cat:'Éducation',      text:"L'école doit d'abord apprendre à lire, écrire et compter, et récompenser les meilleurs élèves.", w:1},
+  {cat:'Institutions',   text:"La France devrait décider seule, sans dépendre autant de l'Union européenne.", w:1.5},
+
+  {cat:'Économie',      text:"Les personnes les plus riches devraient payer plus d'impôts pour financer les services publics.", w:-1.5},
+  {cat:'Social',         text:"Une personne au chômage devrait d'abord chercher un emploi plutôt que compter sur les aides.", w:1.5},
+  {cat:'Santé',          text:"Développer les cliniques privées permettrait d'être soigné plus vite.", w:1.5},
+  {cat:'Sécurité',       text:"Aider les délinquants à se réinsérer fonctionne mieux, sur la durée, que les punir sévèrement.", w:-1.5},
+  {cat:'Immigration',    text:"Les personnes immigrées apportent plus de bénéfices que de problèmes au pays.", w:-1.5},
+  {cat:'Environnement',  text:"L'emploi et la croissance économique doivent passer avant les mesures écologiques.", w:1.5},
+  {cat:'Éducation',      text:"L'école publique devrait recevoir plus d'argent, quitte à en donner moins aux écoles privées.", w:-1.5},
+  {cat:'Institutions',   text:"Les pays européens devraient s'unir davantage, par exemple avec un budget commun.", w:-1.5},
+
+  {cat:'Économie',      text:"Chacun devrait pouvoir se constituer sa propre épargne retraite, plutôt que de dépendre uniquement du système actuel.", w:1.5},
+  {cat:'Social',         text:"Les lois du travail actuelles protègent trop les employeurs, pas assez les salariés.", w:-1},
+  {cat:'Santé',          text:"Se faire soigner doit rester gratuit pour tout le monde, même si cela veut dire payer plus d'impôts.", w:-1},
+  {cat:'Sécurité',       text:"Les peines pour les crimes et délits graves devraient être plus longues et vraiment appliquées.", w:2},
+  {cat:'Immigration',    text:"Pour devenir français, il faudrait remplir des conditions plus strictes qu'aujourd'hui.", w:1.5},
+  {cat:'Environnement',  text:"Chaque personne devrait payer davantage si elle pollue plus, pour l'inciter à changer ses habitudes.", w:-1},
+  {cat:'Éducation',      text:"Il faut plus de discipline et d'autorité dans les écoles.", w:1},
+  {cat:'Institutions',   text:"Le fonctionnement actuel des institutions françaises devrait changer pour donner plus de pouvoir aux citoyens et aux députés.", w:-1.5},
+];
+
+const optionLabels = [
+  {label:"Pas du tout d'accord", val:-2},
+  {label:"Plutôt pas d'accord", val:-1},
+  {label:"Neutre", val:0},
+  {label:"Plutôt d'accord", val:1},
+  {label:"Tout à fait d'accord", val:2},
+];
+
+let current = 0;
+let answers = new Array(questions.length).fill(null);
+
+function startQuiz(){
+  switchView('quiz');
+  renderQuestion();
+}
+
+function switchView(id){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion(){
+  const q = questions[current];
+  document.getElementById('qcount').textContent = `Question ${String(current+1).padStart(2,'0')} / ${questions.length}`;
+  document.getElementById('qcat').textContent = q.cat;
+  document.getElementById('qtext').textContent = q.text;
+  document.getElementById('progressFill').style.width = `${(current/questions.length)*100}%`;
+  document.getElementById('backBtn').disabled = current === 0;
+
+  const opts = document.getElementById('options');
+  opts.innerHTML = '';
+  optionLabels.forEach(o=>{
+    const btn = document.createElement('button');
+    btn.className = 'opt';
+    btn.innerHTML = `<span class="dot"></span>${o.label}`;
+    if(answers[current] === o.val){
+      btn.style.borderColor = 'var(--ink)';
+      btn.style.background = 'rgba(31,35,33,0.05)';
+    }
+    btn.onclick = ()=> selectAnswer(o.val);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(val){
+  answers[current] = val;
+  if(current < questions.length - 1){
+    current++;
+    renderQuestion();
+  } else {
+    document.getElementById('progressFill').style.width = '100%';
+    showResults();
+  }
+}
+
+function goBack(){
+  if(current > 0){
+    current--;
+    renderQuestion();
+  }
+}
+
+function restart(){
+  current = 0;
+  answers = new Array(questions.length).fill(null);
+  switchView('intro');
+}
+
+function computeScores(){
+  let totalW = 0, totalScore = 0;
+  const catData = {};
+  questions.forEach((q,i)=>{
+    const a = answers[i] ?? 0;
+    const contrib = q.w * a;
+    totalScore += contrib;
+    totalW += Math.abs(q.w) * 2;
+    if(!catData[q.cat]) catData[q.cat] = {score:0, max:0};
+    catData[q.cat].score += contrib;
+    catData[q.cat].max += Math.abs(q.w) * 2;
+  });
+  const globalPct = totalW ? (totalScore/totalW)*100 : 0;
+  const catPct = {};
+  Object.keys(catData).forEach(c=>{
+    catPct[c] = catData[c].max ? (catData[c].score/catData[c].max)*100 : 0;
+  });
+  return {globalPct, catPct};
+}
+
+function classify(pct){
+  if(pct <= -60) return {key:'exg', label:'Extrême gauche'};
+  if(pct <= -20) return {key:'g',   label:'Gauche'};
+  if(pct <  20)  return {key:'c',   label:'Centre'};
+  if(pct <  60)  return {key:'d',   label:'Droite'};
+  return {key:'exd', label:'Extrême droite'};
+}
+
+const descriptions = {
+  exg: "Vos réponses traduisent une nette préférence pour l'intervention de l'État, la redistribution forte et une approche progressiste sur les questions de société.",
+  g:   "Vos réponses penchent vers davantage de redistribution, de services publics et de régulation, avec une approche plutôt progressiste.",
+  c:   "Vos réponses sont partagées entre des positions de gauche et de droite selon les thèmes — un profil modéré, sans tendance nette.",
+  d:   "Vos réponses penchent vers la responsabilité individuelle, la libre entreprise et une approche plus ferme sur la sécurité et l'immigration.",
+  exd: "Vos réponses traduisent une nette préférence pour l'ordre, la fermeté sur la sécurité et l'immigration, et la souveraineté nationale."
+};
+
+function showResults(){
+  const {globalPct, catPct} = computeScores();
+  const cls = classify(globalPct);
+
+  switchView('results');
+  document.getElementById('resultTitle').textContent = `Tendance : ${cls.label}`;
+  document.getElementById('resultSub').textContent = "Voici une lecture indicative de vos réponses, à prendre comme point de départ de réflexion plutôt que comme verdict.";
+  document.getElementById('verdictLabel').textContent = cls.label;
+  document.getElementById('verdictScore').textContent = `Score global : ${globalPct >= 0 ? '+' : ''}${globalPct.toFixed(0)} (échelle -100 gauche / +100 droite)`;
+
+  // Needle position: map -100..100 to 2%..98%
+  const clamped = Math.max(-100, Math.min(100, globalPct));
+  const leftPct = ((clamped + 100) / 200) * 96 + 2;
+  requestAnimationFrame(()=>{
+    document.getElementById('needle').style.left = `${leftPct}%`;
+  });
+
+  const desc = descriptions[cls.key];
+  document.getElementById('resultSub').textContent = desc;
+
+  // Breakdown
+  const order = ['Économie','Social','Santé','Sécurité','Immigration','Environnement','Éducation','Institutions'];
+  const bd = document.getElementById('breakdown');
+  bd.innerHTML = '';
+  order.forEach(cat=>{
+    const val = catPct[cat] ?? 0;
+    const row = document.createElement('div');
+    row.className = 'bd-row';
+    const barLeft = val < 0 ? (50 + val/2) : 50;
+    const barWidth = Math.abs(val)/2;
+    const color = val < -10 ? 'var(--gauche)' : (val > 10 ? 'var(--droite)' : 'var(--centre)');
+    row.innerHTML = `
+      <div class="bd-label">${cat}</div>
+      <div class="bd-track">
+        <div class="bd-mid"></div>
+        <div class="bd-fill" style="left:${barLeft}%; width:${barWidth}%; background:${color};"></div>
+      </div>
+      <div class="bd-val">${val >= 0 ? '+' : ''}${val.toFixed(0)}</div>
+    `;
+    bd.appendChild(row);
+  });
+}
+</script>
+</body>
+</html>
